@@ -36,6 +36,7 @@ monthly_data = {
     12: {"N": 56, "death_d": 3, "death_o": 0, "inj_d": 86, "inj_o": 5, "Tm": 0.7, "Hm": 68.8},
 }
 
+
 def calculate_risk(info, T, H):
     deaths = info["death_d"] + info["death_o"]
     injuries_direct = info["inj_d"]
@@ -56,6 +57,7 @@ def calculate_risk(info, T, H):
 
     return round(BR, 1), round(ER, 1), round(risk_index, 1)
 
+
 def interpret_index(risk):
     if risk <= 5:
         return "🟢 정상 (조치 불필요)"
@@ -65,6 +67,7 @@ def interpret_index(risk):
         return "🟠 경계 (점검 필요)"
     else:
         return "🔴 심각 (즉각 조치)"
+
 
 def get_current_weather(info):
     if "city" in info:
@@ -77,6 +80,7 @@ def get_current_weather(info):
     humidity = data["main"]["humidity"]
     return temp, humidity
 
+
 def get_forecast(info):
     if "city" in info:
         url = f"https://api.openweathermap.org/data/2.5/forecast?q={info['city']}&appid={API_KEY}&units=metric"
@@ -84,17 +88,18 @@ def get_forecast(info):
         url = f"https://api.openweathermap.org/data/2.5/forecast?lat={info['lat']}&lon={info['lon']}&appid={API_KEY}&units=metric"
     res = requests.get(url)
     data = res.json()
-    
+
     forecast_list = []
     for item in data["list"]:
         dt = datetime.datetime.fromtimestamp(item["dt"])
         temp = item["main"]["temp"]
         humidity = item["main"]["humidity"]
-        forecast_list.append({"date": dt, "temp": temp, "humidity": humidity})
-        
+        forecast_list.append({"date": dt.date(), "temp": temp, "humidity": humidity})
+
     forecast_df = pd.DataFrame(forecast_list)
-    forecast_df["date"] = forecast_df["date"].dt.strftime("%m-%d %H시")
-    return forecast_df
+    daily_forecast = forecast_df.groupby("date").mean().reset_index()
+    return daily_forecast
+
 
 st.set_page_config(page_title="화학사고 위험지수", page_icon="☣️", layout="wide")
 st.title("☣️ 화학사고 위험지수 실시간 확인 by 이탁수&김민선")
@@ -145,7 +150,7 @@ with col2:
         unsafe_allow_html=True
     )
 
-# 🔥 5일 예보로 위험지수 예측하기
+# 🔥 5일간 평균 예측
 st.markdown("### 📅 5일간 위험지수 예보")
 forecast_df = get_forecast(city_info)
 
@@ -154,7 +159,7 @@ for idx, row in forecast_df.iterrows():
     br_, er_, risk_ = calculate_risk(info, row["temp"], row["humidity"])
     level_ = interpret_index(risk_)
     risk_list.append({
-        "시간": row["date"],
+        "날짜": row["date"].strftime("%m-%d"),
         "예상 온도(°C)": round(row["temp"], 1),
         "예상 습도(%)": round(row["humidity"], 1),
         "예상 위험지수(%)": risk_,
@@ -164,6 +169,9 @@ for idx, row in forecast_df.iterrows():
 risk_forecast_df = pd.DataFrame(risk_list)
 st.dataframe(risk_forecast_df)
 
-# 🚀 자동 새로고침
+# 📜 출처 명시
+st.caption("※ 본 데이터는 OpenWeatherMap API를 기반으로 수집되었습니다.")
+
+# 🚀 자동 새로고침 (5초)
 time.sleep(5)
 st.rerun()
