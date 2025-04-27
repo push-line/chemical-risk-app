@@ -104,15 +104,8 @@ def get_forecast(info):
 st.set_page_config(page_title="화학사고 위험지수", page_icon="☣️", layout="wide")
 st.title("☣️ 화학사고 위험지수 실시간 확인 by 이탁수&김민선")
 
-with st.expander("위험지수 해석 안내"):
-    st.info("""
-    - 🟢 **정상** (5% 이하) → 조치 불필요
-    - 🟡 **주의** (15% 이하) → 모니터링 강화
-    - 🟠 **경계** (30% 이하) → 점검 필요
-    - 🔴 **심각** (30% 초과) → 즉각 조치
-    """)
-
-city_kor = st.selectbox("도시를 선택하세요", list(city_dict.keys()), index=0)
+st.markdown("<h3>🌎 도시를 선택하세요</h3>", unsafe_allow_html=True)
+city_kor = st.selectbox("", list(city_dict.keys()), index=1)
 city_info = city_dict[city_kor]
 
 today = datetime.date.today()
@@ -123,7 +116,7 @@ temp, humidity = get_current_weather(city_info)
 br, er, risk = calculate_risk(info, temp, humidity)
 level = interpret_index(risk)
 
-col1, col2 = st.columns([1, 2])
+col1, col2, col3 = st.columns([1, 2, 3])
 
 with col1:
     st.markdown("### 🌡️ 현재 기상")
@@ -149,6 +142,16 @@ with col2:
         """,
         unsafe_allow_html=True
     )
+with col3:
+    st.markdown("<h6>🛡️위험지수→평년 대비 현재의 온습도에 따른 화학사고 발생 위험도(서부 관내 화학사고 발생 데이터 활용)</h6>", unsafe_allow_html=True)
+    st.markdown("""  
+    | 위험지수 범위 | 등급 | 설명 |
+|:------------|:----|:-----|
+| 0% ~ 5%    | 🟢 정상 | 조치 불필요 |
+| 5% ~ 15%   | 🟡 주의 | 모니터링 강화 |
+| 15% ~ 30%  | 🟠 경계 | 점검 필요 |
+| 30% 이상   | 🔴 심각 | 즉각 조치 필요 |
+""")
 
 # 🔥 5일간 평균 예측
 st.markdown("### 📅 5일간 위험지수 예보")
@@ -159,7 +162,7 @@ for idx, row in forecast_df.iterrows():
     br_, er_, risk_ = calculate_risk(info, row["temp"], row["humidity"])
     level_ = interpret_index(risk_)
     risk_list.append({
-        "날짜": row["date"].strftime("%m-%d"),
+        "날짜": row["date"],
         "예상 온도(°C)": round(row["temp"], 1),
         "예상 습도(%)": round(row["humidity"], 1),
         "예상 위험지수(%)": risk_,
@@ -168,6 +171,7 @@ for idx, row in forecast_df.iterrows():
 
 risk_forecast_df = pd.DataFrame(risk_list)
 st.dataframe(risk_forecast_df)
+
 
 # 📜 출처 명시
 st.caption("※ 본 데이터는 OpenWeatherMap API를 기반으로 수집되었습니다.")
