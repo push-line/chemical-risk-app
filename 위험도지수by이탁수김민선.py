@@ -176,6 +176,6 @@ st.dataframe(risk_forecast_df)
 # 📜 출처 명시
 st.caption("※ 본 데이터는 OpenWeatherMap API를 기반으로 수집되었습니다.")
 
-# 🚀 자동 새로고침 (5초)
-time.sleep(5)
+# 🚀 자동 새로고침 (1초)
+time.sleep(1)
 st.rerun()
