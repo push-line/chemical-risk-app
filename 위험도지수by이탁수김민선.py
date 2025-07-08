@@ -197,4 +197,4 @@ risk_forecast_df = pd.DataFrame(risk_list).head(5)
 
 st.dataframe(risk_forecast_df)
 
-st.caption("※본 데이터는 기상청 및 OpenWeatherMap API 기반으로 수집되었습니다.")
+st.caption("※본 데이터는 기상청 및 OpenWeather API 기반으로 수집되었습니다.")
