@@ -128,7 +128,7 @@ def get_forecast_openweather(city_name):
 # ✅ Streamlit UI
 st.set_page_config(page_title="화학사고 위험지수", page_icon="☣️", layout="wide")
 st.title("☣️ 화학사고 위험지수 실시간 확인")
-st.markdown("<h3 style='margin-bottom: 5px;'>👇사업장 위치를 선택해주세요</h3>", unsafe_allow_html=True)
+st.markdown("<h3 style='margin-bottom: 5px;'>👇사업장 위치를 선택하세요</h3>", unsafe_allow_html=True)
 city_kor = st.selectbox("", list(city_dict.keys()), index=0)
 city_info = city_dict[city_kor]
 
