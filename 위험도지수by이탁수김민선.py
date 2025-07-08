@@ -3,22 +3,28 @@ import requests
 import numpy as np
 import pandas as pd
 import datetime
-import time
 
-API_KEY = "32ce12499c694975782b1fd761dc79c1"
+# 🔥 API 키
+SERVICE_KEY = "iN/Sz1zmIiINI5hTBH3m/XQDjB+oMj/8gzDJytzGQs6XPC3xeLs6c1XLCVWH53VObrUfLFWQTXWcEeM0FG3rXg=="
+OPENWEATHER_KEY = "32ce12499c694975782b1fd761dc79c1"
 
 city_dict = {
-    "서울": {"city": "Seoul", "lat": 37.5665, "lon": 126.9780},
-    "인천시 서구": {"lat": 37.5562, "lon": 126.6757},
-    "인천시 중구": {"lat": 37.4738, "lon": 126.6216},
-    "인천시 남동구": {"lat": 37.4470, "lon": 126.7315},
-    "인천시 부평구": {"lat": 37.5081, "lon": 126.7218},
-    "경기도 시흥시": {"city": "Siheung", "lat": 37.3800, "lon": 126.8022},
-    "경기도 파주시": {"city": "Paju", "lat": 37.7599, "lon": 126.7802},
-    "경기도 김포시": {"city": "Gimpo", "lat": 37.6150, "lon": 126.7159},
-    "경기도 고양시": {"city": "Goyang", "lat": 37.6584, "lon": 126.8320},
-    "경기도 안산시": {"city": "Ansan", "lat": 37.3219, "lon": 126.8309},
-    "경기도 부천시": {"city": "Bucheon", "lat": 37.5034, "lon": 126.7660},
+    "서울시": {"nx": 60, "ny": 127, "name": "Seoul"},
+    "인천시 강화군": {"nx": 51, "ny": 130, "name": "Incheon"},
+    "인천시 계양구": {"nx": 55, "ny": 128, "name": "Incheon"},
+    "인천시 남동구": {"nx": 56, "ny": 125, "name": "Incheon"},
+    "인천시 동구": {"nx": 55, "ny": 126, "name": "Incheon"},
+    "인천시 미추홀구": {"nx": 55, "ny": 125, "name": "Incheon"},
+    "인천시 부평구": {"nx": 56, "ny": 126, "name": "Incheon"},
+    "인천시 서구": {"nx": 55, "ny": 128, "name": "Incheon"},
+    "인천시 연수구": {"nx": 55, "ny": 124, "name": "Incheon"},
+    "인천시 중구": {"nx": 54, "ny": 125, "name": "Incheon"},
+    "경기도 고양시": {"nx": 57, "ny": 128, "name": "Goyang"},
+    "경기도 김포시": {"nx": 55, "ny": 128, "name": "Gimpo"},
+    "경기도 부천시": {"nx": 56, "ny": 126, "name": "Bucheon"},
+    "경기도 시흥시": {"nx": 56, "ny": 125, "name": "Siheung"},
+    "경기도 안산시": {"nx": 57, "ny": 123, "name": "Ansan"},
+    "경기도 파주시": {"nx": 58, "ny": 131, "name": "Paju"},
 }
 
 monthly_data = {
@@ -35,7 +41,6 @@ monthly_data = {
     11: {"N": 78, "death_d": 6, "death_o": 0, "inj_d": 42, "inj_o": 15, "Tm": 7.0, "Hm": 67.8},
     12: {"N": 56, "death_d": 3, "death_o": 0, "inj_d": 86, "inj_o": 5, "Tm": 0.7, "Hm": 68.8},
 }
-
 
 def calculate_risk(info, T, H):
     deaths = info["death_d"] + info["death_o"]
@@ -57,7 +62,6 @@ def calculate_risk(info, T, H):
 
     return round(BR, 1), round(ER, 1), round(risk_index, 1)
 
-
 def interpret_index(risk):
     if risk <= 5:
         return "🟢 정상 (조치 불필요)"
@@ -67,62 +71,81 @@ def interpret_index(risk):
         return "🟠 경계 (점검 필요)"
     else:
         return "🔴 심각 (즉각 조치)"
+def get_current_weather_kma(nx, ny):
+    now = datetime.datetime.now()
+    base_date = now.strftime("%Y%m%d")
+    base_time = now.strftime("%H") + "00"
 
+    if int(now.strftime("%M")) < 45:
+        hour = now - datetime.timedelta(hours=1)
+        base_time = hour.strftime("%H") + "00"
+        base_date = hour.strftime("%Y%m%d")
 
-def get_current_weather(info):
-    if "city" in info:
-        url = f"https://api.openweathermap.org/data/2.5/weather?q={info['city']}&appid={API_KEY}&units=metric"
-    else:
-        url = f"https://api.openweathermap.org/data/2.5/weather?lat={info['lat']}&lon={info['lon']}&appid={API_KEY}&units=metric"
-    res = requests.get(url)
-    data = res.json()
-    temp = data["main"]["temp"]
-    humidity = data["main"]["humidity"]
+    url = "http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst"
+    params = {
+        "serviceKey": SERVICE_KEY,
+        "numOfRows": "100",
+        "pageNo": "1",
+        "dataType": "JSON",
+        "base_date": base_date,
+        "base_time": base_time,
+        "nx": nx,
+        "ny": ny,
+    }
+
+    response = requests.get(url, params=params)
+    data = response.json()
+    items = data["response"]["body"]["items"]["item"]
+
+    temp = None
+    humidity = None
+    for item in items:
+        if item["category"] == "T1H":
+            temp = float(item["obsrValue"])
+        elif item["category"] == "REH":
+            humidity = float(item["obsrValue"])
+
     return temp, humidity
 
-
-def get_forecast(info):
-    if "city" in info:
-        url = f"https://api.openweathermap.org/data/2.5/forecast?q={info['city']}&appid={API_KEY}&units=metric"
-    else:
-        url = f"https://api.openweathermap.org/data/2.5/forecast?lat={info['lat']}&lon={info['lon']}&appid={API_KEY}&units=metric"
-    res = requests.get(url)
-    data = res.json()
+def get_forecast_openweather(city_name):
+    url = f"https://api.openweathermap.org/data/2.5/forecast?q={city_name}&appid={OPENWEATHER_KEY}&units=metric"
+    response = requests.get(url)
+    data = response.json()
 
     forecast_list = []
-    for item in data["list"]:
-        dt = datetime.datetime.fromtimestamp(item["dt"])
-        temp = item["main"]["temp"]
-        humidity = item["main"]["humidity"]
-        forecast_list.append({"date": dt.date(), "temp": temp, "humidity": humidity})
+    for entry in data["list"]:
+        date = entry["dt_txt"].split(" ")[0]
+        temp = entry["main"]["temp"]
+        humidity = entry["main"]["humidity"]
+        forecast_list.append({"date": date, "temp": temp, "humidity": humidity})
 
-    forecast_df = pd.DataFrame(forecast_list)
-    daily_forecast = forecast_df.groupby("date").mean().reset_index()
-    return daily_forecast
+    df = pd.DataFrame(forecast_list)
+    df["date"] = pd.to_datetime(df["date"])
+    daily_df = df.groupby(df["date"].dt.date)[["temp", "humidity"]].mean().reset_index()
 
+    return daily_df
 
+# ✅ Streamlit UI
 st.set_page_config(page_title="화학사고 위험지수", page_icon="☣️", layout="wide")
-st.title("☣️ 화학사고 위험지수 실시간 확인 by 이탁수&김민선")
-
-st.markdown("<h3>🌎 도시를 선택하세요</h3>", unsafe_allow_html=True)
-city_kor = st.selectbox("", list(city_dict.keys()), index=1)
+st.title("☣️ 화학사고 위험지수 실시간 확인 by 한국환경공단☣️")
+st.markdown("<h3 style='margin-bottom: 5px;'>👇사업장 위치를 선택해주세요</h3>", unsafe_allow_html=True)
+city_kor = st.selectbox("", list(city_dict.keys()), index=0)
 city_info = city_dict[city_kor]
 
 today = datetime.date.today()
 month = today.month
 info = monthly_data[month]
 
-temp, humidity = get_current_weather(city_info)
-br, er, risk = calculate_risk(info, temp, humidity)
-level = interpret_index(risk)
+# 🔥 오늘 실황 (기상청)
+temp_now, humidity_now = get_current_weather_kma(city_info["nx"], city_info["ny"])
+br_now, er_now, risk_now = calculate_risk(info, temp_now, humidity_now)
+level_now = interpret_index(risk_now)
 
 col1, col2, col3 = st.columns([1, 2, 3])
-
 with col1:
     st.markdown("### 🌡️ 현재 기상")
-    st.metric("온도", f"{temp}°C")
-    st.metric("습도", f"{humidity}%")
-
+    st.metric("온도", f"{temp_now}°C")
+    st.metric("습도", f"{humidity_now}%")
 with col2:
     st.markdown("### 💥 현재 위험지수")
     st.markdown(
@@ -130,52 +153,48 @@ with col2:
         <div style='
             font-size: 36px;
             font-weight: bold;
-            color: {"red" if risk > 30 else "orange" if risk > 15 else "gold" if risk > 5 else "green"};
+            color: {"red" if risk_now > 30 else "orange" if risk_now > 15 else "gold" if risk_now > 5 else "green"};
             text-align: center;
             border: 3px solid #ddd;
             padding: 1rem;
             border-radius: 15px;
             background-color: #f9f9f9;
         '>
-        위험지수: {risk}%<br>({level})
+        위험지수: {risk_now}%<br>({level_now})
         </div>
         """,
         unsafe_allow_html=True
     )
-with col3:
-    st.markdown("<h6>🛡️위험지수→평년 대비 현재의 온습도에 따른 화학사고 발생 위험도(서부 관내 화학사고 발생 데이터 활용)</h6>", unsafe_allow_html=True)
-    st.markdown("""  
-    | 위험지수 범위 | 등급 | 설명 |
-|:------------|:----|:-----|
-| 0% ~ 5%    | 🟢 정상 | 조치 불필요 |
-| 5% ~ 15%   | 🟡 주의 | 모니터링 강화 |
-| 15% ~ 30%  | 🟠 경계 | 점검 필요 |
-| 30% 이상   | 🔴 심각 | 즉각 조치 필요 |
-""")
 
-# 🔥 5일간 평균 예측
+with col3:
+    st.markdown("🛡️ 위험지수: 평년 대비 현재 온습도 기준 화학사고 발생 위험도</small>", unsafe_allow_html=True)
+    st.markdown("""
+| 위험지수 범위 | 등급 | 설명 | 추천 행동 요령 |
+|:------------|:----|:-----|:-------------|
+| 0% ~ 5%    | 🟢 정상 | 조치 불필요 | 평소처럼 작업하거나 활동을 진행하세요! |
+| 5% ~ 15%   | 🟡 주의 | 모니터링 강화 | 주요 설비 점검 및 모니터링을 강화하세요! |
+| 15% ~ 30%  | 🟠 경계 | 점검 필요 | 보호장비 착용 및 긴급대응 계획을 준비하세요! |
+| 30% 이상   | 🔴 심각 | 즉각 조치 필요 | 즉각적인 작업 중지 및 비상대응 조치를 실행하세요! |
+    """, unsafe_allow_html=True)
+
+# 🔥 5일 예보 (OpenWeather)
 st.markdown("### 📅 5일간 위험지수 예보")
-forecast_df = get_forecast(city_info)
+forecast_df = get_forecast_openweather(city_info["name"])
 
 risk_list = []
 for idx, row in forecast_df.iterrows():
-    br_, er_, risk_ = calculate_risk(info, row["temp"], row["humidity"])
-    level_ = interpret_index(risk_)
+    br, er, risk = calculate_risk(info, row["temp"], row["humidity"])
+    level = interpret_index(risk)
     risk_list.append({
-        "날짜": row["date"],
-        "예상 온도(°C)": round(row["temp"], 1),
-        "예상 습도(%)": round(row["humidity"], 1),
-        "예상 위험지수(%)": risk_,
-        "예상 등급": level_
+        "날짜": row["date"].strftime("%m-%d"),
+        "평균 온도(°C)": round(row["temp"], 1),
+        "평균 습도(%)": round(row["humidity"], 1),
+        "예상 위험지수(%)": risk,
+        "예상 등급": level
     })
 
-risk_forecast_df = pd.DataFrame(risk_list)
+risk_forecast_df = pd.DataFrame(risk_list).head(5)
+
 st.dataframe(risk_forecast_df)
 
-
-# 📜 출처 명시
-st.caption("※ 본 데이터는 OpenWeatherMap API를 기반으로 수집되었습니다.")
-
-# 🚀 자동 새로고침 (1초)
-time.sleep(1)
-st.rerun()
+st.caption("※본 데이터는 기상청 및 OpenWeatherMap API 기반으로 수집되었습니다.")
