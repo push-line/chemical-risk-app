@@ -130,7 +130,7 @@ def get_forecast_openweather(city_name):
 
 # ✅ Streamlit UI
 st.set_page_config(page_title="화학사고 위험지수", page_icon="☣️", layout="wide")
-st.title("☣️ 화학사고 위험지수 실시간 확인 by 한국환경공단☣️")
+st.title("☣️화학사고 위험지수 실시간 확인☣️")
 import streamlit as st
 import gspread
 from google.oauth2.service_account import Credentials
