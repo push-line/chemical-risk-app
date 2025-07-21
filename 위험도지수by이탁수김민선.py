@@ -169,7 +169,7 @@ worksheet.update("A1", [[visitor_count]])
 
 # 🖥️ Streamlit 출력
 st.markdown(f"### 📈총 방문자 수: **{visitor_count}명** ")
-st.markdown("<h3 style='margin-bottom: 5px;'>👇사업장 위치를 선택하세요</h3>", unsafe_allow_html=True)
+st.markdown("<h3 style='margin-bottom: 5px;'>👇사업장 위치 선택</h3>", unsafe_allow_html=True)
 city_kor = st.selectbox("", list(city_dict.keys()), index=0)
 city_info = city_dict[city_kor]
 
