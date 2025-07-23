@@ -170,7 +170,7 @@ worksheet.append_row([str(datetime.datetime.now()), today_str])
 
 # ✅ Streamlit 출력
 st.sidebar.markdown(f"📅총 방문자 수: **{visitor_count}명**")
-st.sidebar.markdown(f"오늘 방문자 수: **{today_count}명**")
+st.sidebar.markdown(f"🔍오늘 방문자 수: **{today_count}명**")
 st.markdown("<h3 style='margin-bottom: 5px;'>👇사업장 위치 선택</h3>", unsafe_allow_html=True)
 city_kor = st.selectbox("", list(city_dict.keys()), index=0)
 city_info = city_dict[city_kor]
