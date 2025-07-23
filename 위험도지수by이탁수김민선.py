@@ -130,9 +130,6 @@ def get_forecast_openweather(city_name):
 # ✅ Streamlit UI
 st.set_page_config(page_title="화학사고 위험지수", page_icon="☣️", layout="wide")
 st.title("☣️화학사고 위험지수 실시간 확인☣️")
-import streamlit as st
-import gspread
-from google.oauth2.service_account import Credentials
 
 # 🔐 인증 범위 설정
 SCOPES = [
@@ -154,43 +151,26 @@ SPREADSHEET_ID = "1eCxc_5yJAWG1_zjlOkN_dlVcHRCqMtFssZlxzbwSdmY"
 sh = gc.open_by_key(SPREADSHEET_ID)
 worksheet = sh.get_worksheet(0)  # 첫 번째 시트 선택
 
-# 🕒 오늘 날짜 포맷
+# 🔄 방문자 수 업데이트
 today_str = date.today().strftime("%Y-%m-%d")
+rows = worksheet.get_all_values()
 
-# ✅ 현재 시트 내용 가져오기
-records = worksheet.get_all_values()
-
-# 헤더가 없으면 초기화
-if not records:
-    worksheet.update("A1:B1", [["날짜", "방문자수"]])
-    records = [["날짜", "방문자수"]]
-
-# 🧮 총 방문자 수 계산
-total_visits = sum(int(row[1]) for row in records[1:] if row[1].isdigit())
-
-# 🔁 오늘 방문자 수 확인 및 업데이트
-today_row_index = None
-for i, row in enumerate(records):
-    if row[0] == today_str:
-        today_row_index = i
-        break
-
-if today_row_index:
-    # 기존 날짜 존재 → 값 증가
-    count = int(records[today_row_index][1]) + 1
-    worksheet.update_cell(today_row_index + 1, 2, count)
-    today_visits = count
+# 총방문자수 A1
+total = worksheet.acell("A1").value
+if total and total.strip().isdigit():
+    visitor_count = int(total) + 1
 else:
-    # 신규 날짜 → 행 추가
-    worksheet.append_row([today_str, 1])
-    today_visits = 1
+    visitor_count = 1
+worksheet.update("A1", [[visitor_count]])
 
-# 🎯 최신 합계 재계산
-total_visits += 1 if today_row_index is None else 0
+# 오늘 날짜 방문자 수
+today_rows = [r[0] for r in rows[1:] if len(r) > 1 and r[1] == today_str]
+today_count = len(today_rows) + 1
+worksheet.append_row([str(datetime.now()), today_str])
 
 # ✅ Streamlit 출력
-st.sidebar.markdown(f"👣 총 방문자 수: **{total_visits}명**")
-st.sidebar.markdown(f"📅 오늘 방문자 수: **{today_visits}명**")
+st.sidebar.markdown(f"📅총 방문자 수: **{visitor_count}명**")
+st.sidebar.markdown(f"오늘 방문자 수: **{today_count}명**")
 st.markdown("<h3 style='margin-bottom: 5px;'>👇사업장 위치 선택</h3>", unsafe_allow_html=True)
 city_kor = st.selectbox("", list(city_dict.keys()), index=0)
 city_info = city_dict[city_kor]
