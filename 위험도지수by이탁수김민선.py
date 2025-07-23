@@ -150,25 +150,28 @@ credentials = Credentials.from_service_account_info(
 # 📊 gspread 클라이언트 생성
 gc = gspread.authorize(credentials)
 
-# ✅ 구글 시트 열기 (방법 1: 파일 ID로 여는 것이 가장 안정적)
-SPREADSHEET_ID = "1eCxc_5yJAWG1_zjlOkN_dlVcHRCqMtFssZlxzbwSdmY"  # 예: 1AbCDeFgHiJKlmn...
+# ✅ 구글 시트 열기 (파일 ID로 여는 방식)
+SPREADSHEET_ID = "1eCxc_5yJAWG1_zjlOkN_dlVcHRCqMtFssZlxzbwSdmY"
 sh = gc.open_by_key(SPREADSHEET_ID)
+worksheet = sh.get_worksheet(0)  # 첫 번째 시트 선택
 
-# 첫 번째 워크시트 선택
-worksheet = sh.get_worksheet(0)
-
-# 🔄 방문자 수 읽기 (A1 셀)
+# 📌 A1: 총 방문자 수 업데이트
 cell = worksheet.acell("A1").value
 visitor_count = int(cell) if cell and cell.strip().isdigit() else 0
-
-# 방문자 수 +1
 visitor_count += 1
-
-# 🔄 업데이트 (2차원 리스트로 전달해야 함)
 worksheet.update("A1", [[visitor_count]])
 
-# 🖥️ Streamlit 출력
-st.markdown(f"### 📈총 방문자 수: **{visitor_count}명** ")
+# 📌 오늘 날짜를 B열에 기록
+today_str = datetime.now().strftime("%Y-%m-%d")
+worksheet.append_row(["", today_str])  # B열에 날짜 기록
+
+# 📌 오늘 방문자 수 계산
+all_dates = worksheet.col_values(2)[1:]  # 헤더 제외
+today_visits = all_dates.count(today_str)
+
+# 📊 Streamlit 출력
+st.sidebar.markdown(f"👁️ 총 방문자 수: **{visitor_count}명**")
+st.sidebar.markdown(f"📅 오늘 방문자 수: **{today_visits}명**")
 st.markdown("<h3 style='margin-bottom: 5px;'>👇사업장 위치 선택</h3>", unsafe_allow_html=True)
 city_kor = st.selectbox("", list(city_dict.keys()), index=0)
 city_info = city_dict[city_kor]
