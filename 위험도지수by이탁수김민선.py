@@ -152,7 +152,7 @@ sh = gc.open_by_key(SPREADSHEET_ID)
 worksheet = sh.get_worksheet(0)  # 첫 번째 시트 선택
 
 # 🔄 방문자 수 업데이트
-today_str = date.today().strftime("%Y-%m-%d")
+today_str = datetime.today().strftime("%Y-%m-%d")
 rows = worksheet.get_all_values()
 
 # 총방문자수 A1
