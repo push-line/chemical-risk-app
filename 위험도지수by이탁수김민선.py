@@ -107,22 +107,25 @@ def get_current_weather_kma(nx, ny):
     return temp, humidity
 
 # 🔽 5일 예보 (OpenWeather)
-def get_forecast_openweather(city_name):
-    url = f"https://api.openweathermap.org/data/2.5/forecast?q={city_name}&appid={OPENWEATHER_KEY}&units=metric"
+def get_forecast_openweather_by_coords(lat, lon):
+    url = f"https://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&appid={OPENWEATHER_KEY}&units=metric"
     response = requests.get(url)
     data = response.json()
+
     if data.get("cod") != "200" or "list" not in data:
-        st.error(f"❌ OpenWeather API 오류: {data.get('message', '알 수 없는 오류')} (도시: {city_name})")
+        st.error(f"❌ OpenWeather API 오류: {data.get('message', '알 수 없는 오류')} (위치: {lat}, {lon})")
         return pd.DataFrame()
+
     forecast_list = []
     for entry in data["list"]:
         date = entry["dt_txt"].split(" ")[0]
         temp = entry["main"]["temp"]
         humidity = entry["main"]["humidity"]
         forecast_list.append({"date": date, "temp": temp, "humidity": humidity})
+
     df = pd.DataFrame(forecast_list)
     df["date"] = pd.to_datetime(df["date"])
-    return df.groupby(df["date"].dt.date)[["temp", "humidity"]].mean().reset_index()
+    return df.groupby(df["date"].dt.date)[["temp", "humidity"]].mean().reset_index()t.date)[["temp", "humidity"]].mean().reset_index()
 
 # ✅ Streamlit 시작
 st.set_page_config(page_title="화학사고 위험지수", page_icon="☣️", layout="wide")
