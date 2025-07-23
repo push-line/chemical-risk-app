@@ -23,9 +23,9 @@ city_dict = {
     "인천시 연수구": {"nx": 55, "ny": 124, "name": "Incheon,kr"},
     "인천시 중구": {"nx": 54, "ny": 125, "name": "Incheon,kr"},
     "경기도 고양시": {"nx": 57, "ny": 128, "name": "Goyang,kr"},
-    "경기도 김포시": {"nx": 55, "ny": 128, "name": "Gimpo,kr"},
+    "경기도 김포시": {"nx": 55, "ny": 128, "name": "Gimpo-si,kr"},
     "경기도 부천시": {"nx": 56, "ny": 126, "name": "Bucheon,kr"},
-    "경기도 시흥시": {"nx": 56, "ny": 125, "name": "Siheung,kr"},
+    "경기도 시흥시": {"nx": 56, "ny": 125, "name": "Siheung-si,kr"},
     "경기도 안산시": {"nx": 57, "ny": 123, "name": "Ansan,kr"},
     "경기도 파주시": {"nx": 58, "ny": 131, "name": "Paju,kr"},
 }
