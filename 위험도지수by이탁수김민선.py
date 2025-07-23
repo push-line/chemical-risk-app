@@ -166,7 +166,7 @@ worksheet.update("A1", [[visitor_count]])
 # 오늘 날짜 방문자 수
 today_rows = [r[0] for r in rows[1:] if len(r) > 1 and r[1] == today_str]
 today_count = len(today_rows) + 1
-worksheet.append_row([str(datetime.now()), today_str])
+worksheet.append_row([str(datetime.date.now()), today_str])
 
 # ✅ Streamlit 출력
 st.sidebar.markdown(f"📅총 방문자 수: **{visitor_count}명**")
