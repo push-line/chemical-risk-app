@@ -125,7 +125,7 @@ def get_forecast_openweather_by_coords(lat, lon):
 
     df = pd.DataFrame(forecast_list)
     df["date"] = pd.to_datetime(df["date"])
-    return df.groupby(df["date"].dt.date)[["temp", "humidity"]].mean().reset_index()t.date)[["temp", "humidity"]].mean().reset_index()
+    return df.groupby(df["date"].dt.date)[["temp", "humidity"]].mean().reset_index()t.date[["temp", "humidity"]].mean().reset_index()
 
 # ✅ Streamlit 시작
 st.set_page_config(page_title="화학사고 위험지수", page_icon="☣️", layout="wide")
