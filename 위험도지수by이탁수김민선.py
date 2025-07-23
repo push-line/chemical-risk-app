@@ -2,7 +2,7 @@ import streamlit as st
 import requests
 import numpy as np
 import pandas as pd
-from datetime import datetime
+from datetime import datetime, date
 import gspread
 from google.oauth2.service_account import Credentials
 
@@ -154,22 +154,42 @@ SPREADSHEET_ID = "1eCxc_5yJAWG1_zjlOkN_dlVcHRCqMtFssZlxzbwSdmY"
 sh = gc.open_by_key(SPREADSHEET_ID)
 worksheet = sh.get_worksheet(0)  # 첫 번째 시트 선택
 
-# 📌 A1: 총 방문자 수 업데이트
-cell = worksheet.acell("A1").value
-visitor_count = int(cell) if cell and cell.strip().isdigit() else 0
-visitor_count += 1
-worksheet.update("A1", [[visitor_count]])
+# 🕒 오늘 날짜 포맷
+today_str = date.today().strftime("%Y-%m-%d")
 
-# 📌 오늘 날짜를 B열에 기록
-today_str = datetime.now().strftime("%Y-%m-%d")
-worksheet.append_row(["", today_str])  # B열에 날짜 기록
+# ✅ 현재 시트 내용 가져오기
+records = worksheet.get_all_values()
 
-# 📌 오늘 방문자 수 계산
-all_dates = worksheet.col_values(2)[1:]  # 헤더 제외
-today_visits = all_dates.count(today_str)
+# 헤더가 없으면 초기화
+if not records:
+    worksheet.update("A1:B1", [["날짜", "방문자수"]])
+    records = [["날짜", "방문자수"]]
 
-# 📊 Streamlit 출력
-st.sidebar.markdown(f"👁️ 총 방문자 수: **{visitor_count}명**")
+# 🧮 총 방문자 수 계산
+total_visits = sum(int(row[1]) for row in records[1:] if row[1].isdigit())
+
+# 🔁 오늘 방문자 수 확인 및 업데이트
+today_row_index = None
+for i, row in enumerate(records):
+    if row[0] == today_str:
+        today_row_index = i
+        break
+
+if today_row_index:
+    # 기존 날짜 존재 → 값 증가
+    count = int(records[today_row_index][1]) + 1
+    worksheet.update_cell(today_row_index + 1, 2, count)
+    today_visits = count
+else:
+    # 신규 날짜 → 행 추가
+    worksheet.append_row([today_str, 1])
+    today_visits = 1
+
+# 🎯 최신 합계 재계산
+total_visits += 1 if today_row_index is None else 0
+
+# ✅ Streamlit 출력
+st.sidebar.markdown(f"👣 총 방문자 수: **{total_visits}명**")
 st.sidebar.markdown(f"📅 오늘 방문자 수: **{today_visits}명**")
 st.markdown("<h3 style='margin-bottom: 5px;'>👇사업장 위치 선택</h3>", unsafe_allow_html=True)
 city_kor = st.selectbox("", list(city_dict.keys()), index=0)
