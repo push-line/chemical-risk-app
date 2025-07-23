@@ -5,7 +5,6 @@ import pandas as pd
 from datetime import datetime
 import gspread
 from google.oauth2.service_account import Credentials
-import datetime
 
 # 🔥 API 키
 SERVICE_KEY = "iN/Sz1zmIiINI5hTBH3m/XQDjB+oMj/8gzDJytzGQs6XPC3xeLs6c1XLCVWH53VObrUfLFWQTXWcEeM0FG3rXg=="
