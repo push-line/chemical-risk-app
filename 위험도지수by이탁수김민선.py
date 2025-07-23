@@ -151,22 +151,21 @@ SPREADSHEET_ID = "1eCxc_5yJAWG1_zjlOkN_dlVcHRCqMtFssZlxzbwSdmY"
 sh = gc.open_by_key(SPREADSHEET_ID)
 worksheet = sh.get_worksheet(0)  # 첫 번째 시트 선택
 
-# 🔄 방문자 수 업데이트
+# 🔽 오늘 날짜 문자열
 today_str = datetime.date.today().strftime("%Y-%m-%d")
-rows = worksheet.get_all_values()
 
-# 총방문자수 A1
+# 🔽 현재 시각 및 날짜 기록 추가
+worksheet.append_row([str(datetime.datetime.now()), today_str])
+
+# 🔽 전체 방문자 수 업데이트
 total = worksheet.acell("A1").value
-if total and total.strip().isdigit():
-    visitor_count = int(total) + 1
-else:
-    visitor_count = 1
+visitor_count = int(total) + 1 if total and total.strip().isdigit() else 1
 worksheet.update("A1", [[visitor_count]])
 
-# 오늘 날짜 방문자 수
-today_rows = [r[0] for r in rows[1:] if len(r) > 1 and r[1] == today_str]
-today_count = len(today_rows) + 1
-worksheet.append_row([str(datetime.datetime.now()), today_str])
+# 🔽 오늘 방문자 수 계산
+rows = worksheet.get_all_values()
+today_rows = [r for r in rows[1:] if len(r) > 1 and r[1] == today_str]
+today_count = len(today_rows)
 
 # ✅ Streamlit 출력
 st.sidebar.markdown(f"📅총 방문자 수: **{visitor_count}명**")
