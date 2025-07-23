@@ -111,9 +111,7 @@ def get_forecast_openweather(city_name):
     url = f"https://api.openweathermap.org/data/2.5/forecast?q={city_name}&appid={OPENWEATHER_KEY}&units=metric"
     response = requests.get(url)
     data = response.json()
-    if data.get("cod") != "200" or "list" not in data:
-        st.error(f"❌ OpenWeather API 오류: {data.get('message', '알 수 없는 오류')} (도시: {city_name})")
-        return pd.DataFrame()
+  
     forecast_list = []
     for entry in data["list"]:
         date = entry["dt_txt"].split(" ")[0]
