@@ -124,7 +124,7 @@ def get_forecast_openweather(city_name):
 
 # ✅ Streamlit 시작
 st.set_page_config(page_title="화학사고 위험지수", page_icon="☣️", layout="wide")
-st.title("☣️ 화학사고 위험지수 실시간 확인")
+st.title("☣화학사고 위험지수 실시간 확인")
 
 # 🔐 구글 인증
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
@@ -199,6 +199,7 @@ else:
     st.dataframe(pd.DataFrame(risk_list).head(6))
 
 st.caption("※본 데이터는 기상청 및 OpenWeatherMap API 기반으로 수집되었습니다.")
+
 
 
 
