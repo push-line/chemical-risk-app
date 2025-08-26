@@ -195,9 +195,10 @@ else:
             "예상 위험지수(%)": risk,
             "예상 등급": level
         })
-    st.dataframe(pd.DataFrame(risk_list).head(5))
+    st.dataframe(pd.DataFrame(risk_list).head(6))
 
 st.caption("※본 데이터는 기상청 및 OpenWeatherMap API 기반으로 수집되었습니다.")
+
 
 
 
