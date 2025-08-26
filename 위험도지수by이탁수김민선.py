@@ -124,7 +124,7 @@ def get_forecast_openweather(city_name):
 
 # ✅ Streamlit 시작
 st.set_page_config(page_title="화학사고 위험지수", page_icon="☣️", layout="wide")
-st.title("☣화학사고 위험지수 실시간 확인")
+st.title("☣️ 화학사고 위험지수 실시간 확인")
 
 # 🔐 구글 인증
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
@@ -184,24 +184,16 @@ if forecast_df.empty:
     st.warning("⚠️ 5일 예보 데이터를 불러올 수 없습니다. 도시명이 올바르지 않거나 API 연결에 문제가 있을 수 있습니다.")
 else:
     risk_list = []
-    weekdays = ["월", "화", "수", "목", "금", "토", "일"]
     for idx, row in forecast_df.iterrows():
-        date_obj = pd.to_datetime(row["date"]) 
         br, er, risk = calculate_risk(info, row["temp"], row["humidity"])
         level = interpret_index(risk)
         risk_list.append({
-            "날짜": date_obj.strftime("%m-%d") + f"({weekdays[date_obj.weekday()]})",
+            "날짜": row["date"].strftime("%m-%d"),
             "평균 온도(°C)": round(row["temp"], 1),
             "평균 습도(%)": round(row["humidity"], 1),
             "예상 위험지수(%)": risk,
             "예상 등급": level
         })
-    st.dataframe(pd.DataFrame(risk_list).head(6))
+    st.dataframe(pd.DataFrame(risk_list).head(5))
 
-st.caption("※본 데이터는 기상청 및 OpenWeatherMap API 기반으로 수집되었습니다.")
-
-
-
-
-
-
+st.caption("※본 데이터는 기상청 및 OpenWeatherMap API 기반으로 수집되었습니다.") 
