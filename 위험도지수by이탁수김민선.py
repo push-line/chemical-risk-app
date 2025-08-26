@@ -188,7 +188,8 @@ else:
         br, er, risk = calculate_risk(info, row["temp"], row["humidity"])
         level = interpret_index(risk)
         risk_list.append({
-            "날짜": row["date"].strftime("%m-%d (%a)"),
+            "요일": row["date}].strftime("%a"),
+            "날짜": row["date"].strftime("%m-%d"),
             "평균 온도(°C)": round(row["temp"], 1),
             "평균 습도(%)": round(row["humidity"], 1),
             "예상 위험지수(%)": risk,
@@ -197,4 +198,5 @@ else:
     st.dataframe(pd.DataFrame(risk_list).head(5))
 
 st.caption("※본 데이터는 기상청 및 OpenWeatherMap API 기반으로 수집되었습니다.")
+
 
