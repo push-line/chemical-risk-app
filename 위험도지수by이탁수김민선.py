@@ -89,10 +89,10 @@ def get_current_weather_kma(nx, ny):
     if now_kst.minute >= 40:
         cand = now_kst.replace(minute=0, second=0, microsecond=0)
     else:
-        cand = (now_kst.replace(minute=0, second=0, microsecond=0) - timedelta(hours=1))
+        cand = (now_kst.replace(minute=0, second=0, microsecond=0) - datetime.timedelta(hours=1))
 
     # 2) 후보 2개: cand, cand-1h (배포 지연 대비)
-    slots = [cand, cand - timedelta(hours=1)]
+    slots = [cand, cand - datetime.timedelta(hours=1)] 
 
     url = "http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst"
     base_params = {
@@ -224,6 +224,7 @@ else:
     st.dataframe(pd.DataFrame(risk_list).head(5))
 
 st.caption("※본 데이터는 기상청 및 OpenWeatherMap API 기반으로 수집되었습니다.") 
+
 
 
 
