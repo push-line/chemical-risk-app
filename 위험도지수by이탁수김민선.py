@@ -250,6 +250,7 @@ with col2:
         """,
         unsafe_allow_html=True
     )
+
 with col3:
     st.markdown("🛡️ 평년 대비 현재 온습도 기준 화학사고 발생 위험도")
     st.markdown("""
@@ -282,6 +283,7 @@ else:
     st.dataframe(pd.DataFrame(risk_list).head(5))
 
 st.caption("※본 데이터는 기상청 및 OpenWeatherMap API 기반으로 수집되었습니다.") 
+
 
 
 
