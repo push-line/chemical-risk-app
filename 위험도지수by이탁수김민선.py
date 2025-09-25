@@ -208,12 +208,10 @@ with col2:
 
     c_left, c_right = st.columns([1,2])
     with c_left:
-        st.markdown(f"<div style='font-size:25px;font-weight:800;margin-bottom:8px;'>"
-                    f"등급: {grade_label}</div>", unsafe_allow_html=True)
         st.markdown(
             f"<div style='font-size:28px;font-weight:800;color:{color};"
             "background:#fff;padding:8px 12px;border-radius:12px;display:inline-block;'>"
-            f"위험지수: {risk_now}%</div>", unsafe_allow_html=True
+            f"위험지수: {risk_now}%</div>", f"등급: {grade_label}</div>", unsafe_allow_html=True
         )
 
     with c_right:
@@ -254,6 +252,7 @@ else:
     st.dataframe(pd.DataFrame(risk_list).head(5))
 
 st.caption("※본 데이터는 기상청 및 OpenWeatherMap API 기반으로 수집되었습니다.") 
+
 
 
 
