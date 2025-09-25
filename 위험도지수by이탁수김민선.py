@@ -209,22 +209,24 @@ with col2:
     c_left, c_right = st.columns([2,1])  # 왼쪽 넓게, 오른쪽 좁게
 
     with c_left:
-        # 위험지수 + 등급을 가로로 나란히 배치
+        # 위험지수 (위)
         st.markdown(
             f"""
-            <div style="display:flex; align-items:center; gap:12px;">
-                <div style="
-                    font-size:28px; font-weight:800; color:{color};
-                    background:#fff; border:2px solid #e5e7eb;
-                    padding:8px 12px; border-radius:12px;
-                ">
-                    위험지수: {risk_now}%
-                </div>
-                <div style="font-size:20px; font-weight:700;">
-                    {grade_label}
-                </div>
+            <div style="
+                font-size:28px; font-weight:800; color:{color};
+                background:#fff; border:2px solid #e5e7eb;
+                padding:8px 12px; border-radius:12px;
+                display:inline-block; margin-bottom:10px;
+            ">
+                위험지수: {risk_now}%
             </div>
             """,
+            unsafe_allow_html=True
+        )
+
+        # 위험등급 (아래)
+        st.markdown(
+            f"<div style='font-size:20px; font-weight:700; color:{color};'>{grade_label}</div>",
             unsafe_allow_html=True
         )
 
@@ -263,6 +265,7 @@ else:
     st.dataframe(pd.DataFrame(risk_list).head(5))
 
 st.caption("※본 데이터는 기상청 및 OpenWeatherMap API 기반으로 수집되었습니다.") 
+
 
 
 
