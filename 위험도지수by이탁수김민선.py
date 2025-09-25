@@ -226,12 +226,12 @@ with col2:
 
         # 위험등급 (아래)
         st.markdown(
-            f"<div style='font-size:20px; font-weight:700; color:{color};'>{grade_label}</div>",
+            f"<div style='font-size:25px; font-weight:700; color:{color};'>{grade_label}</div>",
             unsafe_allow_html=True
         )
 
     with c_right:
-        st.image(risk_icon_map[color], width=100)
+        st.image(risk_icon_map[color], width=300)
 
 with col3:
     st.markdown("🛡️ 평년 대비 현재 온습도 기준 화학사고 발생 위험도")
@@ -265,6 +265,7 @@ else:
     st.dataframe(pd.DataFrame(risk_list).head(5))
 
 st.caption("※본 데이터는 기상청 및 OpenWeatherMap API 기반으로 수집되었습니다.") 
+
 
 
 
