@@ -229,9 +229,8 @@ with col2:
 
 with col3:
     st.markdown("### 📅 5일간 위험지수 예보")
-forecast_df = get_forecast_openweather(city_info["name"])
-
-if forecast_df.empty:
+    forecast_df = get_forecast_openweather(city_info["name"])
+    if forecast_df.empty:
     st.warning("⚠️ 5일 예보 데이터를 불러올 수 없습니다. 도시명이 올바르지 않거나 API 연결에 문제가 있을 수 있습니다.")
 else:
     risk_list = []
@@ -245,7 +244,7 @@ else:
             "예상 위험지수(%)": risk,
             "예상 등급": level
         })
-    st.dataframe(pd.DataFrame(risk_list).head(5))
+    st.dataframe(pd.DataFrame(risk_list).head(4))
 
 # 🔮 5일 예보
     st.markdown("🛡️ 평년 대비 현재 온습도 기준 화학사고 발생 위험도")
@@ -258,6 +257,7 @@ else:
 | 30% 이상   | 🔴 심각 | 즉각 조치 필요 | 즉각적인 작업 중지 및 비상대응 조치를 실행하세요! |
 """, unsafe_allow_html=True)
 st.caption("※본 데이터는 기상청 및 OpenWeatherMap API 기반으로 수집되었습니다.") 
+
 
 
 
