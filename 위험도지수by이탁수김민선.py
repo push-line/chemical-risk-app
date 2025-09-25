@@ -181,6 +181,21 @@ info = monthly_data[month]
 temp_now, humidity_now = get_current_weather_kma(city_info["nx"], city_info["ny"])
 br_now, er_now, risk_now = calculate_risk(info, temp_now, humidity_now)
 level_now = interpret_index(risk_now)
+def risk_color(r):
+    if r > 30:
+        return "red"
+    elif r > 15:
+        return "orange"
+    elif r > 5:
+        return "gold"
+    else:
+        return "green"
+risk_icon_map = {
+    "green": "green.png",
+    "gold": "gold.png",
+    "orange": "orange.png",
+    "red": "red.png",
+}
 
 col1, col2, col3 = st.columns([1, 2, 3])
 with col1:
@@ -189,9 +204,16 @@ with col1:
     st.metric("습도", f"{humidity_now}%")
 with col2:
     st.markdown("### 💥 현재 위험지수")
+    color = risk_color(risk_now)
+    st.image(risk_icon_map[color], width=120, caption=f"등급: {interpret_index(risk_now)}")
+
+    # 텍스트 카드 스타일도 같이 보여주고 싶으면 아래도 유지
     st.markdown(
-        f"""<div style='font-size: 36px; font-weight: bold; color: {"red" if risk_now > 30 else "orange" if risk_now > 15 else "gold" if risk_now > 5 else "green"}; text-align: center; border: 3px solid #ddd; padding: 1rem; border-radius: 15px; background-color: #f9f9f9;'>위험지수: {risk_now}%<br>({level_now})</div>""",
-        unsafe_allow_html=True)
+        f"""<div style='font-size: 28px; font-weight: bold; color: {color}; 
+        text-align: center; border: 2px solid #ddd; padding: 0.5rem; border-radius: 12px; 
+        background-color: #fafafa;'>위험지수: {risk_now}%</div>""",
+        unsafe_allow_html=True
+    )
 with col3:
     st.markdown("🛡️ 평년 대비 현재 온습도 기준 화학사고 발생 위험도")
     st.markdown("""
@@ -224,6 +246,7 @@ else:
     st.dataframe(pd.DataFrame(risk_list).head(5))
 
 st.caption("※본 데이터는 기상청 및 OpenWeatherMap API 기반으로 수집되었습니다.") 
+
 
 
 
