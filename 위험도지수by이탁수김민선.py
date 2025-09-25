@@ -206,7 +206,7 @@ with col2:
     color = risk_color(risk_now)             # "green"/"gold"/"orange"/"red"
     grade_label = interpret_index(risk_now)  # 예: "🟠 경계 (점검 필요)"
 
-    c_left, c_right = st.columns([2,1])  # 왼쪽 넓게, 오른쪽 좁게
+    c_left, c_right = st.columns([1,1])  # 왼쪽 넓게, 오른쪽 좁게
 
     with c_left:
         # 위험지수 (위)
@@ -226,7 +226,7 @@ with col2:
 
         # 위험등급 (아래)
         st.markdown(
-            f"<div style='font-size:25px; font-weight:700; color:{color};'>{grade_label}</div>",
+            f"<div style='font-size:25px; font-weight:700; color:{color};'> 위험등급: {grade_label}</div>",
             unsafe_allow_html=True
         )
 
@@ -265,6 +265,7 @@ else:
     st.dataframe(pd.DataFrame(risk_list).head(5))
 
 st.caption("※본 데이터는 기상청 및 OpenWeatherMap API 기반으로 수집되었습니다.") 
+
 
 
 
