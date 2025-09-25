@@ -203,27 +203,18 @@ with col1:
     st.metric("온도", f"{temp_now}°C")
     st.metric("습도", f"{humidity_now}%")
 with col2:
-    # 위험도 → 색상/아이콘/등급 결정
-    color = risk_color(risk_now)           # "green" / "gold" / "orange" / "red"
-    grade_label = interpret_index(risk_now)
+    # 위험도 → 색상/아이콘 결정
+    color = risk_color(risk_now)
+    grade_label = interpret_index(risk_now)  # 예: "🟠 경계 (점검 필요)"
 
-    # 배경색 매핑
-    bg_color_map = {
-        "green": "#e6f9e8",   # 연한 초록
-        "gold":  "#fff7e0",   # 연한 노랑
-        "orange":"#ffe8d9",   # 연한 주황
-        "red":   "#ffe5e5",   # 연한 빨강
-    }
-    bg_color = bg_color_map[color]
-
-    # 카드 전체 렌더링
+    # 하나의 카드 박스로 감싸기
     st.markdown(
         f"""
         <div style="
             border:3px solid #ddd;
             border-radius:15px;
             padding:1rem;
-            background-color:{bg_color};
+            background-color:#f9f9f9;
             display:flex;
             align-items:center;
         ">
@@ -283,6 +274,7 @@ else:
     st.dataframe(pd.DataFrame(risk_list).head(5))
 
 st.caption("※본 데이터는 기상청 및 OpenWeatherMap API 기반으로 수집되었습니다.") 
+
 
 
 
