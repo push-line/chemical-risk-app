@@ -2,7 +2,8 @@ import streamlit as st
 import requests
 import numpy as np
 import pandas as pd
-import datetime
+from datetime import datetime, timedelta, timezone
+KST = timezone(timedelta(hours=9)) 
 import gspread
 from google.oauth2.service_account import Credentials
 
@@ -76,35 +77,61 @@ def interpret_index(risk):
 
 # 🔽 현재 기상 조회 (기상청)
 def get_current_weather_kma(nx, ny):
-    now = datetime.datetime.now()
-    base_date = now.strftime("%Y%m%d")
-    base_time = now.strftime("%H") + "00"
-    if int(now.strftime("%M")) < 45:
-        hour = now - datetime.timedelta(hours=1)
-        base_time = hour.strftime("%H") + "00"
-        base_date = hour.strftime("%Y%m%d")
+    """
+    KST 기준으로 getUltraSrtNcst의 최신 배포분을 안전하게 가져옴.
+    - 관측은 매시 정각, 보통 xx:40 즈음 배포
+    - :40 이전이면 직전 정시, 이후면 해당 정시를 우선 사용
+    - 응답 없으면 한 슬롯 더 과거로 폴백
+    """
+    now_kst = datetime.now(KST)
+
+    # 1) 우선 시도 슬롯 결정 (:40 rule)
+    if now_kst.minute >= 40:
+        cand = now_kst.replace(minute=0, second=0, microsecond=0)
+    else:
+        cand = (now_kst.replace(minute=0, second=0, microsecond=0) - timedelta(hours=1))
+
+    # 2) 후보 2개: cand, cand-1h (배포 지연 대비)
+    slots = [cand, cand - timedelta(hours=1)]
+
     url = "http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst"
-    params = {
+    base_params = {
         "serviceKey": SERVICE_KEY,
         "numOfRows": "100",
         "pageNo": "1",
         "dataType": "JSON",
-        "base_date": base_date,
-        "base_time": base_time,
         "nx": nx,
         "ny": ny,
     }
-    response = requests.get(url, params=params)
-    data = response.json()
-    items = data["response"]["body"]["items"]["item"]
-    temp = None
-    humidity = None
-    for item in items:
-        if item["category"] == "T1H":
-            temp = float(item["obsrValue"])
-        elif item["category"] == "REH":
-            humidity = float(item["obsrValue"])
-    return temp, humidity
+
+    for dt_ in slots:
+        params = {
+            **base_params,
+            "base_date": dt_.strftime("%Y%m%d"),
+            "base_time": dt_.strftime("%H") + "00",
+        }
+        try:
+            r = requests.get(url, params=params, timeout=10)
+            r.raise_for_status()
+            data = r.json()
+            body = data.get("response", {}).get("body")
+            if not body:
+                continue
+            items = body.get("items", {}).get("item", [])
+            temp = humidity = None
+            for it in items:
+                cat = it.get("category")
+                if cat == "T1H":
+                    temp = float(it["obsrValue"])
+                elif cat == "REH":
+                    humidity = float(it["obsrValue"])
+            if temp is not None and humidity is not None:
+                return temp, humidity
+        except Exception:
+            continue
+
+    # 둘 다 실패 시 None 반환(상위에서 안내/폴백 처리)
+    return None, None
 
 # 🔽 5일 예보 (OpenWeather)
 def get_forecast_openweather(city_name):
@@ -197,3 +224,4 @@ else:
     st.dataframe(pd.DataFrame(risk_list).head(5))
 
 st.caption("※본 데이터는 기상청 및 OpenWeatherMap API 기반으로 수집되었습니다.") 
+
