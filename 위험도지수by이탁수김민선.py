@@ -85,7 +85,6 @@ def get_current_weather_kma(nx, ny):
     """
     now_kst = datetime.datetime.now(KST)
 
-    # 1) 우선 시도 슬롯 결정 (:40 rule)
     if now_kst.minute >= 40:
         cand = now_kst.replace(minute=0, second=0, microsecond=0)
     else:
@@ -130,7 +129,6 @@ def get_current_weather_kma(nx, ny):
         except Exception:
             continue
 
-    # 둘 다 실패 시 None 반환(상위에서 안내/폴백 처리)
     return None, None
 
 # 🔽 5일 예보 (OpenWeather)
@@ -209,7 +207,6 @@ with col2:
     c_left, c_right = st.columns([1,1])  # 왼쪽 넓게, 오른쪽 좁게
 
     with c_left:
-        # 위험지수 (위)
         st.markdown(
             f"""
             <div style="
@@ -223,29 +220,15 @@ with col2:
             """,
             unsafe_allow_html=True
         )
-
-        # 위험등급 (아래)
         st.markdown(
             f"<div style='font-size:25px; font-weight:700; color:{color};'> 등급: {grade_label}</div>",
             unsafe_allow_html=True
         )
-
     with c_right:
         st.image(risk_icon_map[color], width=250)
 
 with col3:
-    st.markdown("🛡️ 평년 대비 현재 온습도 기준 화학사고 발생 위험도")
-    st.markdown("""
-| 위험지수 범위 | 등급 | 설명 | 추천 행동 요령 |
-|:------------|:----|:-----|:-------------|
-| 0% ~ 5%    | 🟢 정상 | 정상 | 평소처럼 작업하거나 활동을 진행하세요! |
-| 5% ~ 15%   | 🟡 주의 | 모니터링 강화 | 주요 설비 점검 및 모니터링을 강화하세요! |
-| 15% ~ 30%  | 🟠 경계 | 점검 필요 | 보호장비 착용 및 긴급대응 계획을 준비하세요! |
-| 30% 이상   | 🔴 심각 | 즉각 조치 필요 | 즉각적인 작업 중지 및 비상대응 조치를 실행하세요! |
-""", unsafe_allow_html=True)
-
-# 🔮 5일 예보
-st.markdown("### 📅 5일간 위험지수 예보")
+    st.markdown("### 📅 5일간 위험지수 예보")
 forecast_df = get_forecast_openweather(city_info["name"])
 
 if forecast_df.empty:
@@ -264,7 +247,18 @@ else:
         })
     st.dataframe(pd.DataFrame(risk_list).head(5))
 
+# 🔮 5일 예보
+    st.markdown("🛡️ 평년 대비 현재 온습도 기준 화학사고 발생 위험도")
+    st.markdown("""
+| 위험지수 범위 | 등급 | 설명 | 추천 행동 요령 |
+|:------------|:----|:-----|:-------------|
+| 0% ~ 5%    | 🟢 정상 | 정상 | 평소처럼 작업하거나 활동을 진행하세요! |
+| 5% ~ 15%   | 🟡 주의 | 모니터링 강화 | 주요 설비 점검 및 모니터링을 강화하세요! |
+| 15% ~ 30%  | 🟠 경계 | 점검 필요 | 보호장비 착용 및 긴급대응 계획을 준비하세요! |
+| 30% 이상   | 🔴 심각 | 즉각 조치 필요 | 즉각적인 작업 중지 및 비상대응 조치를 실행하세요! |
+""", unsafe_allow_html=True)
 st.caption("※본 데이터는 기상청 및 OpenWeatherMap API 기반으로 수집되었습니다.") 
+
 
 
 
