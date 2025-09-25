@@ -2,7 +2,7 @@ import streamlit as st
 import requests
 import numpy as np
 import pandas as pd
-from datetime import datetime, timedelta, timezone, date
+import datetime
 KST = datetime.timezone(datetime.timedelta(hours=9))
 import gspread
 from google.oauth2.service_account import Credentials
@@ -224,5 +224,6 @@ else:
     st.dataframe(pd.DataFrame(risk_list).head(5))
 
 st.caption("※본 데이터는 기상청 및 OpenWeatherMap API 기반으로 수집되었습니다.") 
+
 
 
