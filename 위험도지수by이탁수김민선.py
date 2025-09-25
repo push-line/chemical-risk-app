@@ -213,7 +213,7 @@ with col2:
         st.markdown(
             f"""
             <div style="
-                font-size:28px; font-weight:800; color:{color};
+                font-size:40px; font-weight:800; color:{color};
                 background:#fff; border:2px solid #e5e7eb;
                 padding:8px 12px; border-radius:12px;
                 display:inline-block; margin-bottom:10px;
@@ -226,7 +226,7 @@ with col2:
 
         # 위험등급 (아래)
         st.markdown(
-            f"<div style='font-size:25px; font-weight:700; color:{color};'> 위험등급: {grade_label}</div>",
+            f"<div style='font-size:25px; font-weight:700; color:{color};'> 등급: {grade_label}</div>",
             unsafe_allow_html=True
         )
 
@@ -265,6 +265,7 @@ else:
     st.dataframe(pd.DataFrame(risk_list).head(5))
 
 st.caption("※본 데이터는 기상청 및 OpenWeatherMap API 기반으로 수집되었습니다.") 
+
 
 
 
