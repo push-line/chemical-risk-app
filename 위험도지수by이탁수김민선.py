@@ -203,44 +203,28 @@ with col1:
     st.metric("온도", f"{temp_now}°C")
     st.metric("습도", f"{humidity_now}%")
 with col2:
-    # 위험도 → 색상/아이콘 결정
     color = risk_color(risk_now)
-    grade_label = interpret_index(risk_now)  # 예: "🟠 경계 (점검 필요)"
+    grade_label = interpret_index(risk_now)
 
-    # 하나의 카드 박스로 감싸기
+    # 카드 테두리 박스 흉내
     st.markdown(
-        f"""
-        <div style="
-            border:3px solid #ddd;
-            border-radius:15px;
-            padding:1rem;
-            background-color:#f9f9f9;
-            display:flex;
-            align-items:center;
-        ">
-            <!-- 왼쪽: 아이콘 -->
-            <div style="flex:1; text-align:center;">
-                <img src='{risk_icon_map[color]}' width="100">
-            </div>
-
-            <!-- 오른쪽: 등급 + 위험지수 -->
-            <div style="flex:2; text-align:left; padding-left:1rem;">
-                <div style="font-size:20px; font-weight:700; margin-bottom:8px;">
-                    {grade_label}
-                </div>
-                <div style="
-                    font-size:28px; font-weight:800; color:{color};
-                    border:2px solid #e5e7eb; background:#fff;
-                    padding:8px 12px; border-radius:12px;
-                    display:inline-block;
-                ">
-                    위험지수: {risk_now}%
-                </div>
-            </div>
-        </div>
-        """,
+        "<div style='border:3px solid #ddd;border-radius:15px;padding:1rem;background:#f9f9f9;'>",
         unsafe_allow_html=True
     )
+
+    c_left, c_right = st.columns([1,2])
+    with c_left:
+        st.image(risk_icon_map[color], width=100)
+
+    with c_right:
+        st.markdown(f"<div style='font-size:20px;font-weight:700;margin-bottom:8px;'>{grade_label}</div>", unsafe_allow_html=True)
+        st.markdown(
+            f"<div style='font-size:28px;font-weight:800;color:{color};"
+            "border:2px solid #e5e7eb;background:#fff;padding:8px 12px;border-radius:12px;display:inline-block;'>"
+            f"위험지수: {risk_now}%</div>", unsafe_allow_html=True
+        )
+
+    st.markdown("</div>", unsafe_allow_html=True)
 
 with col3:
     st.markdown("🛡️ 평년 대비 현재 온습도 기준 화학사고 발생 위험도")
@@ -274,6 +258,7 @@ else:
     st.dataframe(pd.DataFrame(risk_list).head(5))
 
 st.caption("※본 데이터는 기상청 및 OpenWeatherMap API 기반으로 수집되었습니다.") 
+
 
 
 
