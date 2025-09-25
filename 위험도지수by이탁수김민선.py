@@ -83,7 +83,7 @@ def get_current_weather_kma(nx, ny):
     - :40 이전이면 직전 정시, 이후면 해당 정시를 우선 사용
     - 응답 없으면 한 슬롯 더 과거로 폴백
     """
-    now_kst = datetime.now(KST)
+    now_kst = datetime.datetime.now(KST)
 
     # 1) 우선 시도 슬롯 결정 (:40 rule)
     if now_kst.minute >= 40:
@@ -224,6 +224,7 @@ else:
     st.dataframe(pd.DataFrame(risk_list).head(5))
 
 st.caption("※본 데이터는 기상청 및 OpenWeatherMap API 기반으로 수집되었습니다.") 
+
 
 
 
