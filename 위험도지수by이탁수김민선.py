@@ -208,10 +208,13 @@ with col2:
 
     c_left, c_right = st.columns([1,2])
     with c_left:
-        st.image(risk_icon_map[color], width=100)
+        st.image(risk_icon_map[color], width=200)
 
     with c_right:
-        st.markdown(f"<div style='font-size:20px;font-weight:700;margin-bottom:8px;'>{grade_label}</div>", unsafe_allow_html=True)
+        st.markdown(
+            f"<div style='font-size:28px;font-weight:800;color:{color};"
+            "background:#fff;padding:8px 12px;border-radius:12px;display:inline-block;'>"
+            f"등급: {grade_label}</div>", unsafe_allow_html=True)
         st.markdown(
             f"<div style='font-size:28px;font-weight:800;color:{color};"
             "background:#fff;padding:8px 12px;border-radius:12px;display:inline-block;'>"
@@ -250,6 +253,7 @@ else:
     st.dataframe(pd.DataFrame(risk_list).head(5))
 
 st.caption("※본 데이터는 기상청 및 OpenWeatherMap API 기반으로 수집되었습니다.") 
+
 
 
 
