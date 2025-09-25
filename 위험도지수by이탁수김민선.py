@@ -2,8 +2,8 @@ import streamlit as st
 import requests
 import numpy as np
 import pandas as pd
-from datetime import datetime, timedelta, timezone
-KST = timezone(timedelta(hours=9)) 
+from datetime import datetime, timedelta, timezone, date
+KST = datetime.timezone(datetime.timedelta(hours=9))
 import gspread
 from google.oauth2.service_account import Credentials
 
@@ -161,8 +161,8 @@ SPREADSHEET_ID = "1eCxc_5yJAWG1_zjlOkN_dlVcHRCqMtFssZlxzbwSdmY"
 worksheet = gc.open_by_key(SPREADSHEET_ID).get_worksheet(0)
 
 # 🔽 방문 기록
-today_str = datetime.date.today().strftime("%Y-%m-%d")
-worksheet.append_row([str(datetime.datetime.now()), today_str])
+today_str = datetime.datetime.now(KST).strftime("%Y-%m-%d")
+worksheet.append_row([str(datetime.datetime.now(KST)), today_str])
 total = worksheet.acell("A1").value
 visitor_count = int(total) + 1 if total and total.strip().isdigit() else 1
 worksheet.update("A1", [[visitor_count]])
@@ -224,4 +224,5 @@ else:
     st.dataframe(pd.DataFrame(risk_list).head(5))
 
 st.caption("※본 데이터는 기상청 및 OpenWeatherMap API 기반으로 수집되었습니다.") 
+
 
