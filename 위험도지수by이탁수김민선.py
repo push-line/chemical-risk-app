@@ -203,15 +203,51 @@ with col1:
     st.metric("온도", f"{temp_now}°C")
     st.metric("습도", f"{humidity_now}%")
 with col2:
-    st.markdown("### 💥 현재 위험지수")
-    color = risk_color(risk_now)
-    st.image(risk_icon_map[color], width=120, caption=f"등급: {interpret_index(risk_now)}")
+    # 위험도 → 색상/아이콘/등급 결정
+    color = risk_color(risk_now)           # "green" / "gold" / "orange" / "red"
+    grade_label = interpret_index(risk_now)
 
-    # 텍스트 카드 스타일도 같이 보여주고 싶으면 아래도 유지
+    # 배경색 매핑
+    bg_color_map = {
+        "green": "#e6f9e8",   # 연한 초록
+        "gold":  "#fff7e0",   # 연한 노랑
+        "orange":"#ffe8d9",   # 연한 주황
+        "red":   "#ffe5e5",   # 연한 빨강
+    }
+    bg_color = bg_color_map[color]
+
+    # 카드 전체 렌더링
     st.markdown(
-        f"""<div style='font-size: 28px; font-weight: bold; color: {color}; 
-        text-align: center; border: 2px solid #ddd; padding: 0.5rem; border-radius: 12px; 
-        background-color: #fafafa;'>위험지수: {risk_now}%</div>""",
+        f"""
+        <div style="
+            border:3px solid #ddd;
+            border-radius:15px;
+            padding:1rem;
+            background-color:{bg_color};
+            display:flex;
+            align-items:center;
+        ">
+            <!-- 왼쪽: 아이콘 -->
+            <div style="flex:1; text-align:center;">
+                <img src='{risk_icon_map[color]}' width="100">
+            </div>
+
+            <!-- 오른쪽: 등급 + 위험지수 -->
+            <div style="flex:2; text-align:left; padding-left:1rem;">
+                <div style="font-size:20px; font-weight:700; margin-bottom:8px;">
+                    {grade_label}
+                </div>
+                <div style="
+                    font-size:28px; font-weight:800; color:{color};
+                    border:2px solid #e5e7eb; background:#fff;
+                    padding:8px 12px; border-radius:12px;
+                    display:inline-block;
+                ">
+                    위험지수: {risk_now}%
+                </div>
+            </div>
+        </div>
+        """,
         unsafe_allow_html=True
     )
 with col3:
@@ -246,6 +282,7 @@ else:
     st.dataframe(pd.DataFrame(risk_list).head(5))
 
 st.caption("※본 데이터는 기상청 및 OpenWeatherMap API 기반으로 수집되었습니다.") 
+
 
 
 
