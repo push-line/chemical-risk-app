@@ -49,19 +49,19 @@ monthly_data = {
 
 # 🔽 위험 계산
 def calculate_risk(info, T, H):
+    if T is None or H is None or np.isnan(T) or np.isnan(H):
+        return 0.0, 0.0, 0.0
     deaths = info["death_d"] + info["death_o"]
     injuries_direct = info["inj_d"]
     injuries_other = info["inj_o"]
     incidents = info["N"]
-    Tm = info["Tm"]
-    Hm = info["Hm"]
-    alpha = 0.02
-    beta = 0.005
+    Tm, Hm = info["Tm"], info["Hm"]
+    alpha, beta = 0.02, 0.005
     score = deaths * 100 + injuries_direct * 40 + injuries_other * 10
     BR = score * (1 + 0.05 * incidents)
     ER = score * (1 + alpha * (T - Tm) + beta * (H - Hm)) * (1 + 0.05 * incidents)
     risk_index = ((ER - BR) / BR) * 100
-    risk_index = np.clip(risk_index, 0, 100)
+    risk_index = float(np.clip(risk_index, 0, 100))
     return round(BR, 1), round(ER, 1), round(risk_index, 1)
 
 # 🔽 위험 해석
@@ -263,6 +263,7 @@ else:
 | 30% 이상   | 🔴 심각 | 즉각 조치 필요 | 즉각적인 작업 중지 및 비상대응 조치를 실행하세요! |
 """, unsafe_allow_html=True)
 st.caption("※본 데이터는 기상청 및 OpenWeatherMap API 기반으로 수집되었습니다.") 
+
 
 
 
