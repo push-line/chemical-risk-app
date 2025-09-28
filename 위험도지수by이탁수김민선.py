@@ -177,6 +177,12 @@ info = monthly_data[month]
 
 # 🔥 현재 실황
 temp_now, humidity_now = get_current_weather_kma(city_info["nx"], city_info["ny"])
+
+if temp_now is None or humidity_now is None:
+    st.warning("⚠️ 기상청 실황 데이터를 불러오지 못했습니다. 평년값으로 대체합니다.")
+    temp_now = info["Tm"]
+    humidity_now = info["Hm"]
+
 br_now, er_now, risk_now = calculate_risk(info, temp_now, humidity_now)
 level_now = interpret_index(risk_now)
 def risk_color(r):
@@ -257,6 +263,7 @@ else:
 | 30% 이상   | 🔴 심각 | 즉각 조치 필요 | 즉각적인 작업 중지 및 비상대응 조치를 실행하세요! |
 """, unsafe_allow_html=True)
 st.caption("※본 데이터는 기상청 및 OpenWeatherMap API 기반으로 수집되었습니다.") 
+
 
 
 
