@@ -210,7 +210,7 @@ with col2:
     color = risk_color(risk_now)             # "green"/"gold"/"orange"/"red"
     grade_label = interpret_index(risk_now)  # 예: "🟠 경계 (점검 필요)"
 
-    c_left, c_right = st.columns([1,1])  # 왼쪽 넓게, 오른쪽 좁게
+    c_left, c_right = st.columns([1,2])  # 왼쪽 넓게, 오른쪽 좁게
 
     with c_left:
         st.markdown(
@@ -231,7 +231,7 @@ with col2:
             unsafe_allow_html=True
         )
     with c_right:
-        st.image(risk_icon_map[color], width=250)
+        st.image(risk_icon_map[color], width=300)
 
 st.markdown("### 📅 5일간 위험지수 예보")
 forecast_df = get_forecast_openweather(city_info["name"])
@@ -262,6 +262,7 @@ else:
 | 30% 이상   | 🔴 심각 | 즉각 조치 필요 | 즉각적인 작업 중지 및 비상대응 조치를 실행하세요! |
 """, unsafe_allow_html=True)
 st.caption("※본 데이터는 기상청 및 OpenWeatherMap API 기반으로 수집되었습니다.") 
+
 
 
 
