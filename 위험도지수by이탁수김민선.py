@@ -168,8 +168,8 @@ rows = worksheet.get_all_values()[1:]
 today_count = sum(1 for r in rows if len(r) >= 2 and r[1].strip() == today_str)
 
 # ✅ 사용자 선택
-st.sidebar.markdown(f"📅총 방문자 수: **{visitor_count}명**")
-st.sidebar.markdown(f"🔍오늘 방문자 수: **{today_count}명**")
+st.sidebar.markdown(f"📅총 조회수: **{visitor_count}명**")
+st.sidebar.markdown(f"🔍오늘의 조회수: **{today_count}명**")
 city_kor = st.selectbox("👇사업장 위치 선택", list(city_dict.keys()), index=0)
 city_info = city_dict[city_kor]
 month = datetime.date.today().month
@@ -262,6 +262,7 @@ else:
 | 30% 이상   | 🔴 심각 | 즉각 조치 필요 | 즉각적인 작업 중지 및 비상대응 조치를 실행하세요! |
 """, unsafe_allow_html=True)
 st.caption("※본 데이터는 기상청 및 OpenWeatherMap API 기반으로 수집되었습니다.") 
+
 
 
 
